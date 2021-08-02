@@ -7,6 +7,8 @@ BUCKET_LINK = 'https://damianbucket.s3.eu-de.cloud-object-storage.appdomain.clou
 
 # This program takes a gzfile stored locally in the machine generates an index and information files for it,
 # uploads them to an IBM Cloud Storage bucket to perform the partioning of the gzfile
+
+# Function to get input information
 def gzfile_info():
     file = input('Indicate the name of the gz file to chunk:')
     lines = input('Indicate the number of lines to retrieve for a chunk:')
@@ -35,21 +37,20 @@ if __name__ == '__main__':
 
     # 1 GENERATING THE INDEX AND INFORMATION FILES AND UPLOADING TO THE BUCKET
     file,lines = gzfile_info()
-    file = ('1c-12S_S96_L001_R1_001.fastq.gz')
     sp.run('./generateUploadIndexInfoBucket.sh '+file+' '+BUCKET_NAME, shell=True, check=True, universal_newlines=True)
     output = sp.getoutput('./generateUploadIndexInfoBucket.sh '+file)
     output = output.split()
     total_lines = str(only_numerics(output[-3]))
-    block_lenght = str(lines)
+    block_length = str(lines)
 
     # 2 GENERATING LINE INTERVAL LIST AND GETTING CHUNK'S BYTE RANGES
-    sp.run('./generateChunks.sh '+file+' '+block_lenght+' '+total_lines+' '+BUCKET_NAME, shell=True, check=True, universal_newlines=True) 
+    sp.run('./generateChunks.sh '+file+' '+block_length+' '+total_lines+' '+BUCKET_NAME, shell=True, check=True, universal_newlines=True) 
     chunk, chunk_counter = read_chunks_info(file)
     
     # 3 RETRIEVE CHUNKS FROM BUCKET AND UNZIP THEM
     for i in chunk:
         print("Processing first chunk... ",i['number'])
-        sp.run('./downloadDecompressChunk.sh '+file+' '+BUCKET_LINK+' '+BUCKET_NAME+' '+i['start_line']+' '+block_lenght+' '+i['start_byte']+' '+i['end_byte'], shell=True, check=True, universal_newlines=True)
+        sp.run('./downloadDecompressChunk.sh '+file+' '+BUCKET_LINK+' '+BUCKET_NAME+' '+i['start_line']+' '+block_length+' '+i['start_byte']+' '+i['end_byte'], shell=True, check=True, universal_newlines=True)
 
 
        

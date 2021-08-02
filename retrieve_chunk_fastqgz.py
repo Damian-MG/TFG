@@ -25,7 +25,6 @@ def read_chunk_info(file, start_line, end_line):
 if __name__ == '__main__':
    
     file,start_line,end_line=gzfile_info()
-    file = ('1c-12S_S96_L001_R1_001.fastq.gz')
     block_length = int(end_line) - int(start_line) + 1
     block_length = str(block_length)
     sp.run('./randomChunkRange.sh '+file+' '+start_line+' '+end_line+' '+BUCKET_NAME, shell=True, check=True, universal_newlines=True)
