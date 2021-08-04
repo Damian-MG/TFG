@@ -25,5 +25,3 @@ bucket=$4
     echo "Start and end lines of the chunk:" $start $end "Start and end Bytes of the chunk:" $start_block $end_block
     echo $start" "$end" "$start_block" "$end_block > "${file}.random_chunk_${start}_${end}.info"
 
-# 2. UPLOADING USEFUL FILES TO THE BUCKET
-lithops storage put "${file}.random_chunk_${start}_${end}.info" $bucket
