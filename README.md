@@ -8,9 +8,9 @@ Teachers: Pedro, GARCIA LOPEZ & Josep, SAMPE DOMENECH
 ## Description
 
 In recent years, the size of the files that store genomic data has increased exponentially to the point where it is no longer feasible to store these files locally without
-compressing them in formats such as gzip. In addition, thanks to cloud computing we can carry out parallel computing, accelerating the execution time of the programs that use this 
-genomic data. This library of python functions for managing large genomic files is designed to work with [Lithops] (https://github.com/lithops-cloud/lithops) and its objective is 
-to partition compressed genomic files in gzip format for their parallel execution.
+compressing them in formats such as gzip. In addition, thanks to cloud computing we can carry out parallel computing, accelerating the execution time of the programs that use 
+this genomic data. This library of python functions for managing large genomic files is designed to work with [Lithops](https://github.com/lithops-cloud/lithops) and its 
+objective is to partition compressed genomic files in gzip format for their parallel execution.
 
 
 ## Requirements
@@ -27,5 +27,14 @@ to partition compressed genomic files in gzip format for their parallel executio
    
    **The Bucket used has to be of public access: The Public Access group will have the role of Content Reader (one can read and list objects in the bucket)
    
+   An example of BUCKET_LINK would be: 'https://BUCKET_NAME.s3.END-POINT.cloud-object-storage.appdomain.cloud/'
+   
 ## Functions
+
+  1. preprocess_chunk_complete_gzfile(BUCKET_NAME, BUCKET_LINK, 'FILE', 'LINES')
+
+
+  3. 
+  
+  2. 
    
