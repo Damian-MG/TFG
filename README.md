@@ -13,5 +13,11 @@ Teachers: Pedro, GARCIA LOPEZ & Josep, SAMPE DOMENECH
       ```
    2. Configuration:
    
-   Lithops provides an extensible backend architecture (compute, storage) that is designed to work with different Cloud providers and on-premise backends. In this sense, you can      code in python and run it unmodified in IBM Cloud, AWS, Azure, Google Cloud and Alibaba Aliyun. Moreover, it provides support for running jobs on vanilla kubernetes, or by        using a kubernetes serverless framework like Knative or OpenWhisk.
+   Lithops provides an extensible backend architecture (compute, storage) that is designed to work with different Cloud providers and on-premise backends. In this sense, you can 
+   code in python and run it unmodified in IBM Cloud, AWS, Azure, Google Cloud and Alibaba Aliyun. Moreover, it provides support for running jobs on vanilla kubernetes, or by
+   using a kubernetes serverless framework like Knative or OpenWhisk.
+   
+   ** The Bucket used has to be of public access: The Public Access group will have the role of Content Reader (one can read and list objects in the bucket)
+   
+##
    
