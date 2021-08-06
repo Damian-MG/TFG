@@ -34,25 +34,34 @@ objective is to partition compressed genomic files in gzip format for their para
   1. preprocess_chunk_complete_gzfile(BUCKET_NAME, BUCKET_LINK, 'FILE', 'LINES')
 
 Files required locally: file.gz
+
 Files required in the bucket: none
+
 Description: The function takes the gzip file, creates the necessary index files for partitioning and stores them in the bucket. Then it creates the partitions of x 'LINES' of the compressed file, unzips them and stores them in the bucket.
 
   2. retrieve_random_chunk_gzfile(BUCKET_NAME, BUCKET_LINK, 'FILE', 'start_line', 'end_line')
 
 Files required locally: file.gzi, file.gzi.info, file.gzi_tab.info
+
 Files required in the bucket: file.gz
+
 Description: The function retrieves a random chunk definded by 'start_line' and 'end_line' of the gzip file stored in the bucket, unzips it and stores it back in the bucket.
 
   3. preprocess_gzfile(BUCKET_NAME, 'FILE')
 
 Files required locally: file.gz
+
 Files required in the bucket: none
+
 Description: The function takes the gzip file, creates the necessary index files for partitioning and stores them in the bucket.
+
 Returns: total_lines
 
   4. chunk_complete_gzfile(BUCKET_NAME, BUCKET_LINK, 'FILE', 'LINES', 'total_lines')
  
 Files required locally: file.gzi, file.gzi.info, file.gzi_tab.info
+
 Files required in the bucket: file.gz
+
 Description: For an already preprocessed gzip file, creates the partitions of x 'LINES' of the compressed file, unzips them and stores them in the bucket.
    
