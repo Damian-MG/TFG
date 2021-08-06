@@ -64,4 +64,13 @@ Files required locally: file.gzi, file.gzi.info, file.gzi_tab.info
 Files required in the bucket: file.gz
 
 Description: For an already preprocessed gzip file, creates the partitions of x 'LINES' of the compressed file, unzips them and stores them in the bucket.
-   
+
+  5. iter_data_bucket_fasta_fastq(storage, BUCKET_NAME, 'fasta_pattern', 'fastq_pattern')
+ 
+Files required locally: none
+
+Files required in the bucket: fasta and fastq chunks
+
+Description: Returns a list with all the combinations of fasta chunks with fastq chunks.
+
+Returns: list of combinations
