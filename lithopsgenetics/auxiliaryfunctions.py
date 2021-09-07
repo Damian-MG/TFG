@@ -35,6 +35,17 @@ def only_numerics(string):
     return string_type().join(filter(string_type.isdigit, string))
 
 
+def get_total_lines(file_name):
+    """
+    gets the total number of lines from the index_tab.info file
+    """
+    with open(file_name+'i_tab.info', 'r') as f:
+        for last_line in f:
+            pass
+
+    return last_line.split(' ')[1]
+
+
 # Function to read information of the chunks from a file
 def read_chunks_info(file):
     chunk_list = []

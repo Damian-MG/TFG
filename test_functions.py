@@ -4,7 +4,6 @@ import os
 import tempfile
 
 BUCKET_NAME = 'josep-datasets'  # change-me, REMEMBER TO DELETE FILES FROM BUCKET WHEN REPROCESSING
-BUCKET_REGION = 'us-east'  # change-me
 TEST_FILE = '1c-12S_S96_L001_R1_001.fastq.gz'
 
 LOCAL_TMP = os.path.realpath(tempfile.gettempdir())
@@ -34,3 +33,6 @@ if __name__ == '__main__':
     # FUNCTION iter_data_bucket_fasta_fastq(lithops_storage, BUCKET_NAME, fasta_pattern, fastq_pattern)
     #iterdata = lithopsgenetics.iterdata_bucket_fasta_fastq(BUCKET_NAME, 'DUMMY_split_', '1c-12S_S96_L001_R1_001.fastq.gz_')
     #print(iterdata)
+
+    iterdata = lithopsgenetics.create_iterdata_from_info_files(BUCKET_NAME, 'DUMMY_fasta_chunk_', os.path.join(LOCAL_TMP, TEST_FILE), 100000)
+    print(iterdata)

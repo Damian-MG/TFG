@@ -6,7 +6,6 @@
 file=$1
 block_lenght=$2
 total_lines=$3
-bucket=$4
 
 rm "${file}.chunks.info"
 

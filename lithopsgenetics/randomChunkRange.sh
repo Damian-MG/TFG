@@ -6,7 +6,6 @@
 file=$1
 start=$2
 end=$3
-bucket=$4
 
 rm "${file}.random_chunk_${start}_${end}.info"
 
