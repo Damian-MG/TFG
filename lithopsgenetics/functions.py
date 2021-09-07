@@ -1,8 +1,9 @@
+# Library of python functions to work with genomic compressed fastq/fasta files
+
 from lithops import Storage
 import subprocess as sp
 import auxiliaryfunctions
 
-# Library of python functions to work with genomic compressed fastq/fasta files
 
 # FUNCTION preprocess_chunk_complete_gzfile(BUCKET_NAME, BUCKET_LINK, file, lines)
 def preprocess_chunk_complete_gzfile(BUCKET_NAME, BUCKET_LINK, file, lines):
@@ -22,6 +23,7 @@ def preprocess_chunk_complete_gzfile(BUCKET_NAME, BUCKET_LINK, file, lines):
     sp.run('rm '+file+'.chunks.info', shell=True, check=True, universal_newlines=True)
     print(str(chunk_counter)+" chunks decompressed.")
 
+
 # FUNCTION retrieve_random_chunk_gzfile(BUCKET_NAME, BUCKET_LINK, file, start_line, end_line)
 def retrieve_random_chunk_gzfile(BUCKET_NAME, BUCKET_LINK, file, start_line, end_line):
     block_length = int(end_line) - int(start_line) + 1
@@ -34,6 +36,7 @@ def retrieve_random_chunk_gzfile(BUCKET_NAME, BUCKET_LINK, file, start_line, end
     sp.run('rm '+file+'.random_chunk_'+start_line+'_'+end_line+'.info', shell=True, check=True, universal_newlines=True)
     print("Chunk decompressed.")
 
+
 # FUNCTION preprocess_gzfile(BUCKET_NAME, file)
 def preprocess_gzfile(BUCKET_NAME, file):
     # 1 GENERATING THE INDEX AND INFORMATION FILES AND UPLOADING TO THE BUCKET
@@ -42,6 +45,7 @@ def preprocess_gzfile(BUCKET_NAME, file):
     output = output.split()
     total_lines = str(auxiliaryfunctions.only_numerics(output[-3]))
     return total_lines
+
 
 # FUNCTION chunk_complete_gzfile(BUCKET_NAME, BUCKET_LINK, file, lines)
 def chunk_complete_gzfile(BUCKET_NAME, BUCKET_LINK, file, lines, total_lines):
@@ -56,9 +60,11 @@ def chunk_complete_gzfile(BUCKET_NAME, BUCKET_LINK, file, lines, total_lines):
     sp.run('rm '+file+'.chunks.info', shell=True, check=True, universal_newlines=True)
     print(str(chunk_counter)+" chunks decompressed.")
 
+
 # FUNCTION iter_data_bucket_fasta_fastq(BUCKET_NAME, fasta_pattern, fastq_pattern)
 def iter_data_bucket_fasta_fastq(storage, BUCKET_NAME, fasta_pattern, fastq_pattern):
     # 1 RETRIEVE KEYS OF THE BUCKET MATCHING THE PREFIX PATTERN AND ITER THROUGH THEM
+    storage = Storage()
     list_fasta = storage.list_objects(BUCKET_NAME, prefix=fasta_pattern)
     list_fastq = storage.list_objects(BUCKET_NAME, prefix=fastq_pattern)
     iter_data = []
