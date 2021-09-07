@@ -24,7 +24,6 @@ sed -e 's/#/\n#/g' -e 's/L//g'  "${file}i.info" |
 echo $tot_size" "$tot_lines >> "${file}i_tab.info"
 
 # 2. UPLOAD FILES TO THE BUCKET
-lithops storage put $file $bucket
 lithops storage put "${file}i" $bucket
 lithops storage put "${file}i.info" $bucket
 lithops storage put "${file}i_tab.info" $bucket
