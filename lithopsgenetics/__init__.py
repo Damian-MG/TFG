@@ -1,1 +1,1 @@
-from lithopsgenetics import *
+from .functions import *
