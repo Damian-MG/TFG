@@ -1,22 +1,52 @@
 # Library of python functions to work with genomic compressed fastq/fasta files
 import pathlib
+import os
+import tempfile
+import logging
 from lithops import Storage
 import subprocess as sp
 import lithopsgenetics.auxiliaryfunctions as af
 
 CURRENT_PATH = str(pathlib.Path(__file__).parent.resolve())
+LOCAL_TMP = os.path.realpath(tempfile.gettempdir())
+REMOTE_PREIX = 'tmp'
+
+
+# FUNCTION preprocess_gzfile(BUCKET_NAME, file)
+def preprocess_gzfile(BUCKET_NAME, file):
+    # 1 GENERATING THE INDEX AND INFORMATION FILES AND UPLOADING TO THE BUCKET
+    sp.run(CURRENT_PATH+'/generateIndexInfo.sh '+file+' '+BUCKET_NAME, shell=True, check=True, universal_newlines=True)
+    output = sp.getoutput(CURRENT_PATH+'/generateUploadIndexInfoBucket.sh '+file)
+    output = output.split()
+    total_lines = str(af.only_numerics(output[-3]))
+
+    # 2. UPLOAD FILES TO THE BUCKET
+    storage = Storage()
+    os.chdir(LOCAL_TMP)
+
+    filename = file.replace(LOCAL_TMP+'/', '')
+
+    print(f'Uploading {filename}i')
+    with open(f'{filename}i', 'rb') as fl:
+        storage.put_object(BUCKET_NAME, f'{REMOTE_PREIX}/{filename}i', fl)
+    print(f'Uploading {filename}i.info')
+    with open(f'{filename}i.info', 'rb') as fl:
+        storage.put_object(BUCKET_NAME, f'{REMOTE_PREIX}/{filename}i.info', fl)
+    print(f'Uploading {filename}i_tab.info')
+    with open(f'{filename}i_tab.info', 'rb') as fl:
+        storage.put_object(BUCKET_NAME, f'{REMOTE_PREIX}/{filename}i_tab.info', fl)
+
+    return total_lines
 
 
 # FUNCTION preprocess_chunk_complete_gzfile(BUCKET_NAME, BUCKET_LINK, file, lines)
 def preprocess_chunk_complete_gzfile(BUCKET_NAME, BUCKET_LINK, file, lines):
-    # 1 GENERATING THE INDEX AND INFORMATION FILES AND UPLOADING TO THE BUCKET
 
-    sp.run(CURRENT_PATH+'/generateUploadIndexInfoBucket.sh '+file+' '+BUCKET_NAME, shell=True, check=True, universal_newlines=True)
-    output = sp.getoutput(CURRENT_PATH+'/generateUploadIndexInfoBucket.sh '+file)
-    output = output.split()
-    total_lines = str(af.only_numerics(output[-3]))
-    block_length = str(lines)
+    # 1 GENERATING THE INDEX AND INFORMATION FILES AND UPLOADING TO THE BUCKET
+    total_lines = preprocess_gzfile(BUCKET_NAME, file)
+
     # 2 GENERATING LINE INTERVAL LIST AND GETTING CHUNK'S BYTE RANGES
+    block_length = str(lines)
     sp.run(CURRENT_PATH+'/generateChunks.sh '+file+' '+block_length+' '+total_lines+' '+BUCKET_NAME, shell=True, check=True, universal_newlines=True) 
     chunk, chunk_counter = af.read_chunks_info(file)
     # 3 RETRIEVE CHUNKS FROM BUCKET AND UNZIP THEM
@@ -40,14 +70,7 @@ def retrieve_random_chunk_gzfile(BUCKET_NAME, BUCKET_LINK, file, start_line, end
     print("Chunk decompressed.")
 
 
-# FUNCTION preprocess_gzfile(BUCKET_NAME, file)
-def preprocess_gzfile(BUCKET_NAME, file):
-    # 1 GENERATING THE INDEX AND INFORMATION FILES AND UPLOADING TO THE BUCKET
-    sp.run(CURRENT_PATH+'/generateUploadIndexInfoBucket.sh '+file+' '+BUCKET_NAME, shell=True, check=True, universal_newlines=True)
-    output = sp.getoutput(CURRENT_PATH+'/generateUploadIndexInfoBucket.sh '+file)
-    output = output.split()
-    total_lines = str(af.only_numerics(output[-3]))
-    return total_lines
+
 
 
 # FUNCTION chunk_complete_gzfile(BUCKET_NAME, BUCKET_LINK, file, lines)
