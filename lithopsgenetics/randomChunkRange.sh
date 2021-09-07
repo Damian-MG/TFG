@@ -8,6 +8,8 @@ start=$2
 end=$3
 bucket=$4
 
+rm "${file}.random_chunk_${start}_${end}.info"
+
 # 1. OBTAINING THE BYTE RANGES CORRESPONDING TO THE LINE INTERVALS
     # get start and end block
     # find closest point with line no. lower than target line no.

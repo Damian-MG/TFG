@@ -8,6 +8,8 @@ block_lenght=$2
 total_lines=$3
 bucket=$4
 
+rm "${file}.chunks.info"
+
 # 1. GENERATE LINE INTERVAL LIST
 intervals=$(awk -v block_len="$block_lenght" -v totlines="$total_lines" '
    BEGIN {
