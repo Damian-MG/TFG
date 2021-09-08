@@ -7,7 +7,6 @@ to do:
 - fix SiNPle output (not generated in lithops)
 '''
 
-import os
 import subprocess as sp
 import logging
 import lithops 
@@ -20,29 +19,40 @@ import lithopsgenetics
 logging.basicConfig(level=os.environ.get("LOGLEVEL", "INFO"))
 
 
-def copy_to_runtime(storage, storage_location, folder, file_name):
-    obj_stream = storage.get_object(bucket=storage_location, key=folder+file_name, stream=True)
+BUCKET_NAME = 'lithops-genomics-varcaller'  # change-me, REMEMBER TO DELETE FILES FROM BUCKET WHEN REPROCESSING
+
+fastq_file = '1c-12S_S96_L001_R1_001.fastq.gz'
+
+# input genome files
+gem_genome = 'NC_000861_charr.gem'
+fa_genome = 'NC_000861_charr.fa'
+fai_genome = 'NC_000861_charr.fa.fai'
+
+ref_folder = "genomics/references/"
+out_folder = "genomics/outputs/"
+
+
+def copy_to_runtime(storage, bucket, folder, file_name, byte_range=None):
+    extra_get_args = {'Range': f'bytes={byte_range}'} if byte_range else {}
+    obj_stream = storage.get_object(bucket=bucket, key=folder+file_name, stream=True, extra_get_args=extra_get_args, )
     temp_file = "/tmp/" + file_name
     with open(temp_file, 'wb') as file:
         shutil.copyfileobj(obj_stream, file)
-        print('Finished copying'+ file_name + 'to local disk')
+        print(f'Finished copying {file_name} to local disk')
     return temp_file
 
 
-# gem3 mapper to mpileup output
-def my_map_function(obj, storage):
-
-    print('Bucket: {}'.format(obj.bucket))
-    print('Copying fastq dataset to local disk')
-    temp_fastq = '/tmp/file.fastq'
-    with open(temp_fastq, 'wb') as fastqfile:
-        shutil.copyfileobj(obj.data_stream, fastqfile)
-        print('Finished copying fastq dataset to local disk')
+def my_map_function(fasta_chunk, fastq_chunk, storage):
+    """
+    gem3 mapper to mpileup output
+    """
+    temp_fasta = copy_to_runtime(storage, BUCKET_NAME, '', fasta_chunk)
+    temp_fastq = copy_to_runtime(storage, BUCKET_NAME, '', fastq_chunk[0], fastq_chunk[1])
 
     # copying reference genomes from cloud storage to runtime
-    temp_gem_ref = copy_to_runtime(storage, storage_location, ref_folder, gem_genome)
-    temp_fa_ref = copy_to_runtime(storage, storage_location, ref_folder, fa_genome)
-    temp_fai_ref = copy_to_runtime(storage, storage_location, ref_folder, fai_genome)
+    temp_gem_ref = copy_to_runtime(storage, BUCKET_NAME, ref_folder, gem_genome)
+    temp_fa_ref = copy_to_runtime(storage, BUCKET_NAME, ref_folder, fa_genome)
+    temp_fai_ref = copy_to_runtime(storage, BUCKET_NAME, ref_folder, fai_genome)
 
     # temporary intermediate file names
     sam_name = os.path.splitext(temp_fastq)[0]+'.se.sam'
@@ -68,9 +78,9 @@ def my_map_function(obj, storage):
 def my_reduce_function(results, storage):
     lineout = []
     for line in results:
-        line = line.decode('UTF-8') 
+        line = line.decode('UTF-8')
         lineout.append(line)
-    output="".join(lineout)
+    output = "".join(lineout)
     #print(output)
     # temp_mpileup = '/tmp/file.mpileup'
     # f = open(temp_mpileup, 'w')
@@ -80,27 +90,20 @@ def my_reduce_function(results, storage):
     # print("sinple output \n")
     # print(sinple_out)
     # storage.put_object(storage_location, 'outputs/test2.txt', body=sinple_out)
-    storage.put_object(storage_location, 'outputs/test2.txt', body=output)
+    storage.put_object(BUCKET_NAME, out_folder+'test2.txt', body=output)
 
 
 if __name__ == "__main__":
 
-    BUCKET_NAME = 'lithops-genomics-varcaller'  # change-me, REMEMBER TO DELETE FILES FROM BUCKET WHEN REPROCESSING
-    BUCKET_LINK = 'https://' + BUCKET_NAME + '.s3.eu-gb.cloud-object-storage.appdomain.cloud/' # change-me
-    lithopsgenetics.preprocess_chunk_complete_gzfile(BUCKET_NAME, BUCKET_LINK, '1c-12S_S96_L001_R1_001.fastq.gz', '100000')
+    # Preliminary steps:
+    # 1. upload the fastq.gz into BUCKET_NAME
+    # 2. Upload the fasta chunks into BUCKET_NAME
 
-    # input genome files
-    gem_genome = 'NC_000861_charr.gem'
-    fa_genome = 'NC_000861_charr.fa'
-    fai_genome = 'NC_000861_charr.fa.fai'
+    # Create index files (only once)
+    # lithopsgenetics.preprocess_gzfile(BUCKET_NAME, fastq_file)
 
-    # cloud bucket locations (IBM cos)
-    storage_location = 'cloudbutton-bioinformatics'
-    fastq_location = BUCKET_NAME
-    ref_folder = "references/"
-    out_folder = "outputs/"
-
-    iterdata = [fastq_location]
+    # Generate iterdata
+    iterdata = lithopsgenetics.create_iterdata_from_info_files(BUCKET_NAME, 'DUMMY_split_', fastq_file, 100000)
 
     fexec = lithops.FunctionExecutor(runtime='lumimar/ibm_gem3_runtime:0.2')
     #fexec.map(my_map_function, iterdata)
