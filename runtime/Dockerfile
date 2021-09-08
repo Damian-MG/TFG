@@ -1,11 +1,25 @@
-FROM python:3.8-slim-buster
+# Python 3.6
+#FROM continuumio/miniconda3:4.5.4 
+
+# Python 3.7
+#FROM continuumio/miniconda3:4.7.12
+
+# Python 3.8
+FROM continuumio/miniconda3:4.9.2
+
+# Python 3.9
+#FROM continuumio/miniconda3:4.10.3
+
+# YOU MUST PIN THE PYTHON VERSION TO PREVENT IT TO BE UPDATED
+# For python 3.6 use "python==3.6.5"
+# For python 3.7 use "python==3.7.4"
+# For python 3.8 use "python==3.8.5"
+# For python 3.9 use "python==3.9.5"
+RUN echo "python==3.8.5" >> /opt/conda/conda-meta/pinned
 
 ENV FLASK_PROXY_PORT 8080
-# Set up miniconda path 
-ENV PATH="/root/miniconda3/bin:${PATH}"
-ARG PATH="/root/miniconda3/bin:${PATH}"
 
-RUN apt-get update \
+RUN apt-get --allow-releaseinfo-change update \
     # add some packages required for the pip install
     && apt-get install -y \
         gcc \
@@ -15,6 +29,7 @@ RUN apt-get update \
         zip \
         unzip \
         make \
+        zlib1g-dev \
     # required elements for samtools installation
         autoconf \ 
         automake \ 
@@ -26,26 +41,28 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/* \
     && apt-cache search linux-headers-generic
 
-# install miniconda
-RUN wget \
-    https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh \
-    && mkdir /root/.conda \
-    && bash Miniconda3-latest-Linux-x86_64.sh -b \
-    && rm -f Miniconda3-latest-Linux-x86_64.sh 
-RUN conda --version
 
+# Add your Conda required packages here. Ensure "conda clean --all" at 
+# the end to remove temporary data. One "RUN" line is better than multiple
+# ones in terms of image size.
 # Install samtools and vcftools
-RUN conda install -c bioconda -y samtools=1.11
-RUN conda install -c bioconda gem3-mapper
+RUN conda update -n base conda && conda install -c bioconda -y samtools=1.11 gem3-mapper && conda clean --all
+
 
 COPY requirements.txt requirements.txt
 COPY SiNPle-0.5 /bin/SiNPle-0.5
-COPY mpileup_merge_reduce.sh bin/mpileup_merge_reduce.sh
+COPY mpileup_merge_reduce.sh /bin/mpileup_merge_reduce.sh
 COPY test.txt test.txt
 
-RUN chmod u+x /bin/SiNPle-0.5
-RUN chmod u+x bin/mpileup_merge_reduce.sh
+RUN chmod ugo+x /bin/SiNPle-0.5 && chmod ugo+x /bin/mpileup_merge_reduce.sh
 RUN pip install --upgrade pip setuptools six && pip install --no-cache-dir -r requirements.txt
+
+
+# Download, compile and install gztool
+RUN wget https://github.com/circulosmeos/gztool/archive/refs/tags/v1.4.1.zip && \
+    unzip v1.4.1.zip && rm v1.4.1.zip && cd gztool-1.4.1 && gcc -O3 -o gztool gztool.c -lz -lm && \
+    cp gztool /bin/gztool && chmod ugo+x /bin/gztool
+
 
 # create action working directory
 RUN mkdir -p /action \

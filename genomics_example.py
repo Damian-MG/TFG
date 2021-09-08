@@ -58,9 +58,12 @@ def my_map_function(fasta_chunk, fastq_chunk, storage):
     temp_fastq = temp_fastq_gz.replace('.gz', '')
     temp_fastq_i = copy_to_runtime(storage, BUCKET_NAME, idx_folder, f'{fastq_file_key}i')
     block_length = str(int(fastq_chunk_data['end_line']) - int(fastq_chunk_data['start_line']) + 1)
-    cmd = f'gztool -I {temp_fastq_i}i -n {fastq_chunk_data["start_byte"]} -L {fastq_chunk_data["start_line"]} {temp_fastq} | head -{block_length} > {temp_fastq}'
+    cmd = f'gztool -I {temp_fastq_i} -n {fastq_chunk_data["start_byte"]} -L {fastq_chunk_data["start_line"]} {temp_fastq_gz} | head -{block_length} > {temp_fastq}'
     sp.run(cmd, shell=True, check=True, universal_newlines=True)
 
+    print(os.listdir("/tmp"))
+
+    return 0
     # copying reference genomes from cloud storage to runtime
     temp_gem_ref = copy_to_runtime(storage, BUCKET_NAME, ref_folder, gem_genome)
     temp_fa_ref = copy_to_runtime(storage, BUCKET_NAME, ref_folder, fa_genome)
@@ -116,6 +119,6 @@ if __name__ == "__main__":
     # Generate iterdata
     iterdata = lithopsgenetics.create_iterdata_from_info_files(BUCKET_NAME, fasta_chunks_prefix, fastq_file, 100000)
 
-    fexec = lithops.FunctionExecutor(runtime='lumimar/ibm_gem3_runtime:0.2', log_level='DEBUG')
+    fexec = lithops.FunctionExecutor(runtime='jsampe/lithops-ibmcf-gem3-v38:01', log_level='DEBUG')
     fexec.map_reduce(my_map_function, iterdata, my_reduce_function)
     result = fexec.get_result()
