@@ -35,11 +35,11 @@ def only_numerics(string):
     return string_type().join(filter(string_type.isdigit, string))
 
 
-def get_total_lines(file_name):
+def get_total_lines(file):
     """
     gets the total number of lines from the index_tab.info file
     """
-    with open(file_name+'i_tab.info', 'r') as f:
+    with open(file+'i_tab.info', 'r') as f:
         for last_line in f:
             pass
 

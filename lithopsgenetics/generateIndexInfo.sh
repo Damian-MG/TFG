@@ -4,9 +4,6 @@
 
 # COMMAND LINE INPUT
 file=$1
-echo $file
-bucket=$2
-echo $bucket
 
 # 1. INDEX FASTQ.GZ AND REFORMAT INDEX INFO
 # Create index -i, with line number information -x, with span in uncompressed MiB between index points
