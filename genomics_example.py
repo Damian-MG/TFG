@@ -55,7 +55,7 @@ def my_map_function(fasta_chunk, fastq_chunk, storage):
     temp_fastq_gz = copy_to_runtime(storage, BUCKET_NAME, '', fastq_file_key, byte_range)
 
     # getting index and decompressing fastq chunk
-    temp_fastq = temp_fastq_gz.replace('.gz', '')
+    temp_fastq = temp_fastq_gz.replace('.fastq.gz', f'_chunk{fastq_chunk_data["number"]}.fastq')
     temp_fastq_i = copy_to_runtime(storage, BUCKET_NAME, idx_folder, f'{fastq_file_key}i')
     block_length = str(int(fastq_chunk_data['end_line']) - int(fastq_chunk_data['start_line']) + 1)
     cmd = f'gztool -I {temp_fastq_i} -n {fastq_chunk_data["start_byte"]} -L {fastq_chunk_data["start_line"]} {temp_fastq_gz} | head -{block_length} > {temp_fastq}'
@@ -68,6 +68,8 @@ def my_map_function(fasta_chunk, fastq_chunk, storage):
 
     # verify all files are in /tmp
     print(os.listdir("/tmp"))
+    print('Going to process fastq chunk:', temp_fastq)
+    print(fastq_chunk_data)
 
     # temporary intermediate file names
     sam_name = os.path.splitext(temp_fastq)[0]+'.se.sam'
@@ -88,23 +90,23 @@ def my_map_function(fasta_chunk, fastq_chunk, storage):
     return mpileup_out
 
 
-# mpileup merge and SNP calling with SiNPle
 def my_reduce_function(results, storage):
+    """
+    Mpileup merge and SNP calling with SiNPle
+    """
     lineout = []
     for line in results:
         line = line.decode('UTF-8')
         lineout.append(line)
     output = "".join(lineout)
-    #print(output)
-    # temp_mpileup = '/tmp/file.mpileup'
-    # f = open(temp_mpileup, 'w')
-    # f.write(output)
-    # sinple_out = sp.check_output(['bash','/bin/mpileup_merge_reduce.sh', temp_mpileup, '/bin/'])
-    # sinple_out = sinple_out.decode('UTF-8') 
-    # print("sinple output \n")
-    # print(sinple_out)
-    # storage.put_object(storage_location, 'outputs/test2.txt', body=sinple_out)
-    storage.put_object(BUCKET_NAME, out_folder+'test2.txt', body=output)
+
+    temp_mpileup = '/tmp/file.mpileup'
+    with open(temp_mpileup, 'w') as f:
+        f.write(output)
+    sinple_out = sp.check_output(['bash', '/bin/mpileup_merge_reduce.sh', temp_mpileup, '/bin/'])
+    sinple_out = sinple_out.decode('UTF-8')
+
+    storage.put_object(BUCKET_NAME, out_folder+'test2.txt', body=sinple_out)
 
 
 if __name__ == "__main__":

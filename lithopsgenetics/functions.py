@@ -106,7 +106,7 @@ def download_index_files(bucket_name, file_name, storage=None):
     os.chdir(CWD)
 
 
-def chunk_complete_gzfile(bucket_name, file_name, lines, total_lines):
+def chunk_complete_gzfile(bucket_name, file_name, lines):
     """
     This function creates the partitions of x 'LINES' of the compressed file,
     unzips them and stores them in the bucket.
@@ -119,6 +119,7 @@ def chunk_complete_gzfile(bucket_name, file_name, lines, total_lines):
     # 2 GENERATING LINE INTERVAL LIST AND GETTING CHUNK'S BYTE RANGES
     print('\n--> Generating chunks')
     os.chdir(LOCAL_TMP)
+    total_lines = af.get_total_lines(file_name)
     block_length = str(lines)
     sp.run(CURRENT_PATH+'/generateChunks.sh '+file_name+' '+block_length+' '+total_lines,
            shell=True, check=True, universal_newlines=True)
@@ -133,7 +134,7 @@ def chunk_complete_gzfile(bucket_name, file_name, lines, total_lines):
         byte_range = f"{int(chunk['start_byte'])-1}-{int(chunk['end_byte'])}"
         obj_stream = storage.get_object(bucket_name, file_name, extra_get_args={'Range': f'bytes={byte_range}'}, stream=True)
 
-        local_chunk_filename = os.path.join(LOCAL_TMP, f"{file_name}_{chunk['start_line']}.fastq")
+        local_chunk_filename = os.path.join(LOCAL_TMP, file_name.replace('.fastq.gz', f'_chunk{chunk["number"]}.fastq'))
         local_chunk_filename_gz = f"{local_chunk_filename}.gz"
 
         with open(local_chunk_filename_gz, 'wb') as fl:
@@ -144,7 +145,7 @@ def chunk_complete_gzfile(bucket_name, file_name, lines, total_lines):
 
         print(f'Uploading {local_chunk_filename} to cos://{bucket_name}/{CHUNKS_PREIX}')
         with open(local_chunk_filename, 'rb') as fl:
-            remote_chunk_filename = CHUNKS_PREIX+f"{file_name}_{chunk['start_line']}.fastq"
+            remote_chunk_filename = CHUNKS_PREIX+file_name.replace('.fastq.gz', f'_chunk{chunk["number"]}.fastq')
             storage.put_object(bucket_name, remote_chunk_filename, fl)
 
         os.remove(local_chunk_filename)
@@ -162,10 +163,10 @@ def preprocess_chunk_complete_gzfile(bucket_name, file_name, lines):
     of x 'LINES' of the compressed file, unzips them and stores them in the bucket.
     """
     # 1 GENERATING THE INDEX AND INFORMATION FILES AND UPLOADING TO THE BUCKET
-    total_lines = preprocess_gzfile(bucket_name, file_name)
+    preprocess_gzfile(bucket_name, file_name)
 
     # 2 GENERATING LINE INTERVAL LIST AND GETTING CHUNK'S BYTE RANGES
-    chunk_complete_gzfile(bucket_name, file_name, lines, total_lines)
+    chunk_complete_gzfile(bucket_name, file_name, lines)
 
 
 def retrieve_random_chunk_gzfile(bucket_name, file_name, start_line, end_line):
@@ -188,7 +189,7 @@ def retrieve_random_chunk_gzfile(bucket_name, file_name, start_line, end_line):
     byte_range = f"{int(chunk['start_byte'])-1}-{int(chunk['end_byte'])}"
     obj_stream = storage.get_object(bucket_name, remote_file_name, extra_get_args={'Range': f'bytes={byte_range}'}, stream=True)
 
-    local_chunk_filename = f"{file_name}_{chunk['start_line']}.fastq"
+    local_chunk_filename = os.path.join(LOCAL_TMP, file_name.replace('.fastq.gz', f'_chunk{chunk["number"]}.fastq'))
     local_chunk_filename_gz = f"{local_chunk_filename}.gz"
 
     with open(local_chunk_filename_gz, 'wb') as fl:
@@ -200,7 +201,7 @@ def retrieve_random_chunk_gzfile(bucket_name, file_name, start_line, end_line):
 
     print(f'Uploading {local_chunk_filename} to cos://{bucket_name}/{CHUNKS_PREIX}')
     with open(local_chunk_filename, 'rb') as fl:
-        remote_chunk_filename = CHUNKS_PREIX+f"{file_name}_{chunk['start_line']}.fastq"
+        remote_chunk_filename = CHUNKS_PREIX+file_name.replace('.fastq.gz', f'_chunk{chunk["number"]}.fastq')
         storage.put_object(bucket_name, remote_chunk_filename, fl)
 
     os.remove(local_chunk_filename)
