@@ -61,13 +61,13 @@ def my_map_function(fasta_chunk, fastq_chunk, storage):
     cmd = f'gztool -I {temp_fastq_i} -n {fastq_chunk_data["start_byte"]} -L {fastq_chunk_data["start_line"]} {temp_fastq_gz} | head -{block_length} > {temp_fastq}'
     sp.run(cmd, shell=True, check=True, universal_newlines=True)
 
-    print(os.listdir("/tmp"))
-
-    return 0
     # copying reference genomes from cloud storage to runtime
     temp_gem_ref = copy_to_runtime(storage, BUCKET_NAME, ref_folder, gem_genome)
     temp_fa_ref = copy_to_runtime(storage, BUCKET_NAME, ref_folder, fa_genome)
     temp_fai_ref = copy_to_runtime(storage, BUCKET_NAME, ref_folder, fai_genome)
+
+    # verify all files are in /tmp
+    print(os.listdir("/tmp"))
 
     # temporary intermediate file names
     sam_name = os.path.splitext(temp_fastq)[0]+'.se.sam'
