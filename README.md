@@ -19,7 +19,14 @@ objective is to partition compressed genomic files in gzip format for their para
       ```bash
       $ pip install lithops
       ```
-   2. Configuration:
+   2. Install GZTOOL on your UNIX system from the unix repositories:
+
+      ```bash
+      $ sudo apt-get install gztool
+      ```
+      This tool created by Roberto S. Galende [circulosmeos](https://github.com/circulosmeos) is required to work with compressed gzip files.
+ 
+ 3. Configuration:
  
  Lithops provides an extensible backend architecture (compute, storage) that is designed to work with different Cloud providers and on-premise backends. In this sense, you can 
  code in python and run it unmodified in IBM Cloud, AWS, Azure, Google Cloud and Alibaba Aliyun. Moreover, it provides support for running jobs on vanilla kubernetes, or by
