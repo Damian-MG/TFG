@@ -33,9 +33,6 @@ objective is to partition compressed genomic files in gzip format for their para
  code in python and run it unmodified in IBM Cloud, AWS, Azure, Google Cloud and Alibaba Aliyun. Moreover, it provides support for running jobs on vanilla kubernetes, or by
  using a kubernetes serverless framework like Knative or OpenWhisk.
    
-   **The Bucket used has to be of public access: The Public Access group will have the role of Content Reader (one can read and list objects in the bucket)
-   
-   An example of BUCKET_LINK would be: 'https://BUCKET_NAME.s3.END-POINT.cloud-object-storage.appdomain.cloud/'
    
 ## Functions
 
