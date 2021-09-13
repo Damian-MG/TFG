@@ -25,6 +25,7 @@ objective is to partition compressed genomic files in gzip format for their para
       $ sudo apt-get install gztool
       ```
       This tool created by Roberto S. Galende [circulosmeos](https://github.com/circulosmeos) is required to work with compressed gzip files.
+      Make sure to get v1.4.2 or later, previous versions won't work as espected.
  
  3. Configuration:
  
