@@ -59,8 +59,8 @@ RUN pip install --upgrade pip setuptools six && pip install --no-cache-dir -r re
 
 
 # Download, compile and install gztool
-RUN wget https://github.com/circulosmeos/gztool/archive/refs/tags/v1.4.1.zip && \
-    unzip v1.4.1.zip && rm v1.4.1.zip && cd gztool-1.4.1 && gcc -O3 -o gztool gztool.c -lz -lm && \
+RUN wget https://github.com/circulosmeos/gztool/archive/refs/tags/v1.4.2.zip && \
+    unzip v1.4.2.zip && rm v1.4.2.zip && cd gztool-1.4.2 && gcc -O3 -o gztool gztool.c -lz -lm && \
     cp gztool /bin/gztool && chmod ugo+x /bin/gztool
 
 
