@@ -18,6 +18,7 @@ curl -r "${start_byte_}-${end_byte}" "${link}${file}" > "${file}_${start_line}.f
 # 2. UNZIP THE CHUNK
 gztool -I "${file}i" -n ${start_byte} -L ${start_line} "${file}_${start_line}.fastq.gz" | head -${block_length} > "${file}_${start_line}.fastq"
 
+
 # 3. UPLOAD FILES TO THE BUCKET
 lithops storage put "${file}_${start_line}.fastq" $bucket
 

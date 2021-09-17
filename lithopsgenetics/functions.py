@@ -238,6 +238,7 @@ def create_iterdata_from_info_files(bucket_name, fasta_file_prefix, fastq_file_n
 
     os.chdir(LOCAL_TMP)
     total_lines = af.get_total_lines(fastq_file_name)
+    total_lines = str(int(total_lines) + 1)
 
     list_fasta = storage.list_keys(bucket_name, prefix=fasta_file_prefix)
 

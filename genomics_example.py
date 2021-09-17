@@ -15,7 +15,7 @@ import os.path
 import lithopsgenetics
 
 
-BUCKET_NAME = 'josep-datasets'  # change-me, REMEMBER TO DELETE FILES FROM BUCKET WHEN REPROCESSING
+BUCKET_NAME = 'damianbucket'  # change-me, REMEMBER TO DELETE FILES FROM BUCKET WHEN REPROCESSING
 fasta_chunks_prefix = 'DUMMY_split_'
 fastq_file = '1c-12S_S96_L001_R1_001.fastq.gz'
 
@@ -121,6 +121,6 @@ if __name__ == "__main__":
     # Generate iterdata
     iterdata = lithopsgenetics.create_iterdata_from_info_files(BUCKET_NAME, fasta_chunks_prefix, fastq_file, 100000)
 
-    fexec = lithops.FunctionExecutor(runtime='jsampe/lithops-ibmcf-gem3-v38:02', log_level='DEBUG')
+    fexec = lithops.FunctionExecutor(runtime='jsampe/lithops-ibmcf-gem3-v38:02',runtime_memory=1024,log_level='DEBUG')
     fexec.map_reduce(my_map_function, iterdata, my_reduce_function)
     result = fexec.get_result()
