@@ -48,3 +48,9 @@ genomics/references/sequence.gem
 </tr>
 
 </table>
+
+3. Run from your UNIX machine
+
+```bash
+python3 genomics_example.py
+```
