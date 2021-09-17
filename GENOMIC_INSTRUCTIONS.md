@@ -51,6 +51,6 @@ genomics/references/sequence.gem
 
 3. Run from your UNIX machine
 
-      ```bash
-      $ python3 genomics_example.py
-      ```
+```bash
+$ python3 genomics_example.py
+```
