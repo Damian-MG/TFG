@@ -29,7 +29,7 @@ if __name__ == '__main__':
     # FUNCTION preprocess_chunk_complete_file(BUCKET_NAME, BUCKET_LINK, file, lines)
     lithopsgenetics.preprocess_chunk_complete_gzfile(BUCKET_NAME, TEST_FILE_NAME, '100000')
 
-    # FUNCTION retrieve_random_chunk_gzfile(BUCKET_NAME, BUCKET_LINK, file, start_line, end_line)
+    # FUNCTION retrieve_random_chunk_gzfile(BUCKET_NAME, file, start_line, end_line)
     #lithopsgenetics.retrieve_random_chunk_gzfile(BUCKET_NAME, TEST_FILE_NAME, '101000', '150000')
 
     # FUNCTION iter_data_bucket_fasta_fastq(lithops_storage, BUCKET_NAME, fasta_pattern, fastq_pattern)
