@@ -1,6 +1,5 @@
 #!/bin/bash
-# Script generateUploadIndexInfoBucket.sh: Takes a gzip file and creates an index for it, reformates the index info,
-#                                          stores important files in a bucket
+# Script generateUploadIndexInfoBucket.sh: Takes a gzip file and creates an index for it, reformates the index info
 
 # COMMAND LINE INPUT
 file=$1
